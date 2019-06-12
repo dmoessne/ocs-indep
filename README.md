@@ -3,7 +3,7 @@
 * this playbook is to run preperation steps from [official documented steps]( https://access.redhat.com/documentation/en-us/red_hat_openshift_container_storage/3.11/html/deployment_guide/chap-documentation-container_ready_storage_independent#CRS_Installing_Red_Hat_Storage_Server_on_Red_Hat_Enterprise_Linux_Layered_Install_independent)
 
 * you have to ensure the following prereqs are applicable
-  * needed repos are enabled, i.e.: rhel-7-server-rpms, rh-gluster-3-for-rhel-7-server-rpms
+  * needed repos are enabled, i.e.: `rhel-7-server-rpms`, `rh-gluster-3-for-rhel-7-server-rpms`:wq
   * kernel version > `kernel-3.10.0-862.14.4.el7.x86_64` (RHEL 7.5 EUS or newer)
   * we assume you use `firewalld` (the playbook for configuring OCS with OCP 3.11 does take care as well, so you can uncomment that part if you use `iptables`)
   * also, this playbook only works if you do have `glusterfs`and/or `glusterfs_registry` group(s) already configured in OCP inventory
