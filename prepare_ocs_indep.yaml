@@ -1,5 +1,5 @@
 ---
-- hosts: glusterfs
+- hosts: glusterfs:glusterfs_registry
   gather_facts: yes
   tasks:
   #- name: check kernel version 
