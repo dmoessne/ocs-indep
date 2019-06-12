@@ -16,3 +16,5 @@
    * checks for updates and if updates are found apply them and reboot the OCS independent hosts
 
 * then you can deploy OCS independent either with a fresh OCP install or after OCP has already been installed. Refer to the [appropriate docs](https://access.redhat.com/documentation/en-us/red_hat_openshift_container_storage/3.11/html/deployment_guide/install-example-basic-external-crs) how to do that
+
+* Once everything is installed, you can use [this git repo](https://github.com/dmoessne/ocs-tests) for some tests
