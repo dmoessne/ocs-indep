@@ -1,0 +1,109 @@
+---
+- hosts: glusterfs
+  gather_facts: yes
+  tasks:
+  #- name: check kernel version 
+  - name: install gluster server with block
+    yum: 
+      name:
+        - redhat-storage-server
+        - gluster-block
+      state: present
+
+  - name: create firewall rules
+    firewalld:
+      port: "{{ item }}/tcp"
+      permanent: yes
+      state: enabled
+    with_items:
+        - '24010'
+        - '3260'
+        - '111'
+        - '22'
+        - '24007'
+        - '24009'
+        - '49152-49664'
+
+  - name: "load module: dm_thin_pool"
+    modprobe:
+      name: dm_thin_pool
+      state: present
+
+  - name: "load module: target_core_user"
+    modprobe:
+      name: target_core_user
+      state: present
+
+  - name: "load module: dm_multipath"
+    modprobe:
+      name: dm_multipath
+      state: present
+
+  - name: "make module persistent: dm_thin_pool"
+    copy:
+      dest: /etc/modules-load.d/dm_thin_pool.conf
+      content: dm_thin_pool
+
+  - name: "make module persistent: target_core_user"
+    copy:
+      dest: /etc/modules-load.d/target_core_user.conf
+      content: target_core_user
+
+  - name: "make module persistent: dm_multipath"
+    copy:
+      dest: /etc/modules-load.d/dm_multipath.conf
+      content: dm_multipath
+
+  - name: enable services
+    service:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+    with_items:
+        - sshd
+        - glusterd
+        - gluster-blockd
+
+# optional upgrade part
+
+  - name: check if updates are available at all
+    shell: yum list updates | awk 'f;/Updated Packages/{f=1;}' | awk '/-rpms$/ { print $1 }'
+    args:
+      warn: false
+    register: updates
+    changed_when: updates.stdout_lines | length > 0
+
+  - name: display if packages found to be updated
+    debug:
+      msg: "Found packages to update, going ahead and proceeding with update"
+    when: updates.stdout_lines | length > 0
+
+  - name: Skip host if no new packages are available
+    debug:
+      msg: "No packages updates found, skipping host {{ inventory_hostname }}"         
+    when: updates.stdout_lines | length < 1
+
+# We start th whole procedure only if there are packages to update at all
+
+  - when: updates.stdout_lines | length > 0
+    block:
+      - name: update node
+        yum:
+           name: '*'
+           state: latest
+
+      - name: reboot node
+        shell: /bin/sleep 5 && shutdown -r now "Ansible updates triggered"
+        async: 1
+        poll: 0
+        ignore_errors: true
+    
+      - name: wait for node to become available again
+        wait_for:
+           host: "{{ inventory_hostname }}"
+           port: 22
+           state: started
+           delay: 60
+           timeout: 300
+        become: False
+        delegate_to: 127.0.0.1
