@@ -1,4 +1,4 @@
-# ocs-indep
+# Playbook for applying prepreqisits for OCS 3.11.x in independent mode
 
 * this playbook is to run preperation steps from [official documented steps]( https://access.redhat.com/documentation/en-us/red_hat_openshift_container_storage/3.11/html/deployment_guide/chap-documentation-container_ready_storage_independent#CRS_Installing_Red_Hat_Storage_Server_on_Red_Hat_Enterprise_Linux_Layered_Install_independent)
 
